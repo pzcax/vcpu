@@ -24,12 +24,14 @@ This readme will talk about how the cpu is structured.
 - The program counter will store the memory address of the next instruction
 
 ### Memory
-- Word addressable
+- Byte addressable
 - 1 kilobit for now, could expand to 2, 4, 8, 16, etc.
 
 ### ALU (Arithmetic Logic Unit)
 - Literally just does math for the processor. No access to memory, none of that.
 - Handles things like: add, sub, mul, div, and, or, xor, shl, shr
+
+## Notes
 
 ### Instruction Format
 - Instructions are formatted like so: 
