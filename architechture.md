@@ -3,10 +3,6 @@ This readme will talk about how the cpu is structured.
 
 ## References:
 
-### Sizes (for reference)
-- 8 bits -> 1 byte (enough for a single ASCII character OR 256 values)
-- 125 bytes -> 1 kilobit
-
 ### Hexadecimal:
 - hexadecminal can be written many ways. These two are the main ones:
     - 0x00 - 0xFF
@@ -18,61 +14,83 @@ This readme will talk about how the cpu is structured.
 
 ### Registers:
 - There will be 4 registers but will expand to 6 for parameters later
-- 64 bits (8 bytes) per register
+- 16 bits (2 bytes) per register
 
 ### PC (Program Store)
-- The program counter will store the memory address of the next instruction
+- The program counter will store the absolute memory address of the next instruction
 
 ### Memory
-- Byte addressable
-- 1 kilobit for now, could expand to 2, 4, 8, 16, etc.
-
-### ALU (Arithmetic Logic Unit)
-- Literally just does math for the processor. No access to memory, none of that.
-- Handles things like: add, sub, mul, div, and, or, xor, shl, shr
+- Byte addressable 
+- 2 kilobit for now, could expand to 4, 8, 16, etc.
+- Starts at 1. 0 based indexing is only internal for python, but publicly, use 1 based indexing.
 
 ## Notes
 
 ### Instruction Format
 - Instructions are formatted like so: 
     - opcode
-        - 1 byte (written as hexadecimal (0x00 - 0xFF))
+        - 1 byte
     - operand 1
         - 1 byte
     - operand 2
-        - 1 byte
-    - immediates represented as 2 bytes in decimal format
+        - 1 byte (immediates represented as 2 bytes in little endian, signed, integer)
 - opcodes and non-immediates are written as hexadecimal (0x00 - 0xFF)
 
 ### ISA (Instruction Set Architecture)
 | Opcode | Name 
 | ------ | -----
-| 0x01   | mov    
-| 0x02   | load
-| 0x03   | store
+| 0x00   | halt
+| 0x01   | imov    
+| 0x02   | mov
+| 0x03   | iadd
 | 0x04   | add
-| 0x05   | sub
-| 0x06   | jmp
-| 0x07   | cmp
-| 0x08   | halt
-| 0x09   | reserved
+| 0x05   | isub
+| 0x06   | sub
+| 0x07   | imul
+| 0x08   | mul
+| 0x09   | idiv
+| 0x0A   | div
+| 0x0B   | icmp
+| 0x0C   | cmp
+| 0x0D   | ijmp
+| 0x0E   | je
+| 0x0F   | jne
+| 0x10   | jl
+| 0x11   | jle
+| 0x12   | jg
+| 0x13   | jge
+| 0x14   | ipush
+| 0x15   | push
+| 0x16   | pop
+| 0x17   | istore
+| 0x18   | store
+| 0x19   | load
+| 0x1A   | loadr
+| 0x1B   | call
+| 0x1C   | ret
+| 0x1D   | iout
+| 0x1E   | out
+| 0x1F   | in
+
+All jmp opcodes take in one immediate operand
+
+cmp sets flags, and jmp opcodes simply jump to that absolute memory address if the relevant flags are true.
+
+Be aware that 0x17-0x1A do not follow standard naming conventions. 
 
 | ID | Register
-| ------  |------ 
-| 0x0A    | r1 
-| 0x0B    | r2
-| 0x0C    | r3
-| 0x0D    | r4
+| ------  |------
+| 0xFB    | SP
+| 0xFC    | R1 
+| 0xFD    | R2
+| 0xFE    | R3
+| 0xFF    | R4
 
-### Example program
-`MOV  R0, 123`
+### Ports
 
-`MOV` -> `0x01`
+Ports connect the CPU to devices.
 
-`R0`     -> `0xA`
-
-`123`    -> `7B 00`
-
-Full instruction would be 
-
-`0x01 0xA 7B 00` -> `01 10 7B 00`
+| Port | Device | Purpose
+| ---  | ------ | ------
+| 1    | Console| Display a character
+| 2    | Keyboard| Read key buffer
